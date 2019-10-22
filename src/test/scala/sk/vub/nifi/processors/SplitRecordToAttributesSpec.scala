@@ -1,18 +1,16 @@
 package sk.vub.nifi.processors
 
 import org.apache.nifi.json.JsonTreeReader
-import org.apache.nifi.schema.access.SchemaAccessUtils
 import org.apache.nifi.serialization.record.MockRecordParser
 import org.apache.nifi.util.TestRunners
 import org.scalatest.{FunSpec, Matchers}
-
 import sk.vub.nifi.processors.SplitRecordsToAttributes._
 
 import scala.jdk.CollectionConverters._
 
 class SplitRecordToAttributesSpec extends FunSpec with Matchers {
 
-  it("simple test") {
+  it("simple record - json") {
     val in: String =
       """
         |[
@@ -26,34 +24,6 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
         |]
       """.stripMargin
 
-    val inputSchemaText =
-      """
-        |{
-        |  "type" : "record",
-        |  "name" : "MyClass",
-        |  "namespace" : "com.test.avro",
-        |  "fields" : [ {
-        |    "name" : "id",
-        |    "type" : "long"
-        |  }, {
-        |    "name" : "date",
-        |    "type" : "string"
-        |  }, {
-        |    "name" : "boolean",
-        |    "type" : "boolean"
-        |  }, {
-        |    "name" : "arrays",
-        |    "type" : {
-        |      "type" : "array",
-        |      "items" : "long"
-        |    }
-        |  }, {
-        |    "name" : "null",
-        |    "type" : [ "string", "null" ]
-        |  } ]
-        |}
-      """.stripMargin
-
     val processor = new SplitRecordsToAttributes
     val runner = TestRunners.newTestRunner(processor)
 
@@ -65,8 +35,6 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
 
     val jsonReader = new JsonTreeReader
     runner.addControllerService("reader", jsonReader)
-    runner.setProperty(jsonReader, SchemaAccessUtils.SCHEMA_ACCESS_STRATEGY, SchemaAccessUtils.SCHEMA_TEXT_PROPERTY)
-    runner.setProperty(jsonReader, SchemaAccessUtils.SCHEMA_TEXT, inputSchemaText)
     runner.enableControllerService(jsonReader)
 
     runner.setProperty(P.recordReader, "reader")
@@ -85,10 +53,13 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
       flowFile.assertAttributeEquals("boolean", "true")
       flowFile.assertAttributeEquals("arrays", "[1, 2, 3]")
       flowFile.assertAttributeEquals("null", null)
+      flowFile.assertAttributeEquals("record.count", "1")
+      flowFile.assertAttributeEquals("fragment.count", "1")
+      flowFile.assertAttributeEquals("fragment.index", "0")
     }
   }
 
-  it("simple test 2") {
+  it("two records - json") {
     val in: String =
       """
         |[
@@ -109,34 +80,6 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
         |]
       """.stripMargin
 
-    val inputSchemaText =
-      """
-        |{
-        |  "type" : "record",
-        |  "name" : "MyClass",
-        |  "namespace" : "com.test.avro",
-        |  "fields" : [ {
-        |    "name" : "id",
-        |    "type" : "long"
-        |  }, {
-        |    "name" : "date",
-        |    "type" : "string"
-        |  }, {
-        |    "name" : "boolean",
-        |    "type" : "boolean"
-        |  }, {
-        |    "name" : "arrays",
-        |    "type" : {
-        |      "type" : "array",
-        |      "items" : "long"
-        |    }
-        |  }, {
-        |    "name" : "null",
-        |    "type" : [ "string", "null" ]
-        |  } ]
-        |}
-      """.stripMargin
-
     val processor = new SplitRecordsToAttributes
     val runner = TestRunners.newTestRunner(processor)
 
@@ -148,8 +91,6 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
 
     val jsonReader = new JsonTreeReader
     runner.addControllerService("reader", jsonReader)
-    runner.setProperty(jsonReader, SchemaAccessUtils.SCHEMA_ACCESS_STRATEGY, SchemaAccessUtils.SCHEMA_TEXT_PROPERTY)
-    runner.setProperty(jsonReader, SchemaAccessUtils.SCHEMA_TEXT, inputSchemaText)
     runner.enableControllerService(jsonReader)
 
     runner.setProperty(P.recordReader, "reader")
@@ -167,6 +108,8 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
       flowFile.assertAttributeExists("boolean")
       flowFile.assertAttributeExists("arrays")
       flowFile.assertAttributeExists("null")
+      flowFile.assertAttributeEquals("record.count", "2")
+      flowFile.assertAttributeEquals("fragment.count", "2")
     }
   }
 }

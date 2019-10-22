@@ -1,7 +1,9 @@
 package sk.vub.nifi.processors
 
-import org.apache.nifi.annotation.behavior.InputRequirement
+import java.util.UUID
+
 import org.apache.nifi.annotation.behavior.InputRequirement.Requirement
+import org.apache.nifi.annotation.behavior.{InputRequirement, WritesAttribute, WritesAttributes}
 import org.apache.nifi.annotation.documentation.{CapabilityDescription, Tags}
 import org.apache.nifi.components.PropertyDescriptor
 import org.apache.nifi.flowfile.FlowFile
@@ -10,14 +12,22 @@ import org.apache.nifi.processor.{ProcessContext, ProcessSession, Relationship}
 import org.apache.nifi.serialization.RecordReaderFactory
 import org.apache.nifi.serialization.record.Record
 import sk.vub.nifi.ops._
-import sk.vub.nifi.{FlowFileNotNull, ScalaProcessor, _}
 import sk.vub.nifi.processors.SplitRecordsToAttributes._
+import sk.vub.nifi.{FlowFileNotNull, ScalaProcessor, _}
 
 import scala.jdk.CollectionConverters._
 
-@Tags(Array("split", "record", "attributes"))
+@Tags(Array("split", "record", "attribute", "json", "avro", "csv"))
 @InputRequirement(Requirement.INPUT_REQUIRED)
-@CapabilityDescription("Split Record to Attributes")
+@CapabilityDescription("Splits up an input FlowFile that is in a record-oriented data format into multiple smaller FlowFiles and content is also split into attributes as text")
+@WritesAttributes(Array(
+      new WritesAttribute(attribute = V.RecordCount, description = "The number of records in the FlowFile. This is added to FlowFiles that are routed to the 'splits' Relationship."),
+      new WritesAttribute(attribute = V.FragmentIndexKey, description = "All split FlowFiles produced from the same parent FlowFile will have the same randomly generated UUID added for this attribute"),
+      new WritesAttribute(attribute = V.FragmentIndexKey, description = "A one-up number that indicates the ordering of the split FlowFiles that were created from a single parent FlowFile"),
+      new WritesAttribute(attribute = V.FragmentCountKey, description = "The number of split FlowFiles generated from the parent FlowFile"),
+      new WritesAttribute(attribute = V.SegmentOriginalFilenameKey, description = "The filename of the parent FlowFile")
+  )
+)
 class SplitRecordsToAttributes extends ScalaProcessor with FlowFileNotNull {
 
   def properties: List[PropertyDescriptor] = List (P.recordReader, P.evaluateContent)
@@ -27,14 +37,15 @@ class SplitRecordsToAttributes extends ScalaProcessor with FlowFileNotNull {
   def onTrigger(flowFile: FlowFile)(implicit context: ProcessContext, session: ProcessSession): Unit = {
     val readerFactory = P.recordReader.asControllerService[RecordReaderFactory]
     val evaluateContent = P.evaluateContent.evaluate(flowFile).get.toBoolean
+    val fragmentId = UUID.randomUUID().toString;
 
     withThrowableAsEither(()) { _ =>
       withResource(flowFile.read()) { in =>
         withResource(readerFactory.createRecordReader(flowFile, in, logger)) { reader =>
           val iterator: Iterator[Record] = Iterator.continually(reader.nextRecord()).takeWhile(_ != null)
-          for {
-            record <- iterator
-          } {
+          val records = iterator.toList
+          val recordCount = records.size
+          records.zipWithIndex.foreach { case (record, fragmentIndex) =>
             val attributes: Map[String, String] = (for {
               rawField <- record.getRawFieldNames.asScala
             } yield {
@@ -48,8 +59,12 @@ class SplitRecordsToAttributes extends ScalaProcessor with FlowFileNotNull {
 
             flowFile
               .createChild()
+              .putAttribute(V.RecordCount, recordCount.toString)
+              .putAttribute(V.FragmentIdKey, fragmentId)
+              .putAttribute(V.FragmentCountKey, recordCount.toString)
+              .putAttribute(V.FragmentIndexKey, fragmentIndex.toString)
+              .putAttribute(V.SegmentOriginalFilenameKey, flowFile.getAttribute(CoreAttributes.FILENAME.key()))
               .putAllAttributes(attributes)
-              .putAttribute(CoreAttributes.FILENAME.key, System.nanoTime().toString)
               .transfer(R.splits)
           }
         }
@@ -97,5 +112,13 @@ object SplitRecordsToAttributes {
     val failure: Relationship = new Relationship.Builder()
       .name("failure")
       .build()
+  }
+
+  object V {
+    final val RecordCount = "record.count"
+    final val FragmentIdKey = "fragment.identifier"
+    final val FragmentIndexKey = "fragment.index"
+    final val FragmentCountKey = "fragment.count"
+    final val SegmentOriginalFilenameKey = "segment.original.filename"
   }
 }
