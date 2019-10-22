@@ -5,7 +5,7 @@ import org.apache.nifi.controller.ControllerService
 import org.apache.nifi.flowfile.FlowFile
 import org.apache.nifi.processor.ProcessContext
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.reflect.ClassTag
 
 class PropertyDescriptorOps(val pd: PropertyDescriptor) extends AnyVal {

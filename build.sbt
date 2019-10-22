@@ -4,10 +4,8 @@ name := "nifi-processor-scala-bundle"
 organization := "sk.vub"
 version := "0.1"
 
-scalaVersion := "2.12.10"
+scalaVersion := "2.13.1"
 nifiVersion := "1.9.2"
-
-val circeVersion = "0.9.3"
 
 libraryDependencies ++= Seq(
   "org.apache.nifi" % "nifi-api",
@@ -20,13 +18,6 @@ libraryDependencies ++= Seq(
   "org.apache.nifi" % "nifi-hadoop-utils",
   "org.apache.nifi" % "nifi-mock"
 ).map(_ % nifiVersion.value)
-
-libraryDependencies ++= Seq(
-  "io.circe" %% "circe-core",
-  "io.circe" %% "circe-generic",
-  "io.circe" %% "circe-parser",
-  "io.circe" %% "circe-optics"
-).map(_ % circeVersion)
 
 libraryDependencies ++= Seq(
   "org.scalactic" %% "scalactic" % "3.0.8",

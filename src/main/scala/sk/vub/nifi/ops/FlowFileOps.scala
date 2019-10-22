@@ -1,8 +1,4 @@
-package sk.vub.nifi.ops//impor//import org.apache.nifi.json.{JsonTreeRowRecordReader, WriteJsonResult}
-//import org.apache.nifi.record.NullSuppression
-//import org.apache.nifi.schema.access.NopSchemaAccessWritert org.apache.nifi.json.{JsonTreeRowRecordReader, WriteJsonResult}
-//import org.apache.nifi.record.NullSuppression
-//import org.apache.nifi.schema.access.NopSchemaAccessWriter
+package sk.vub.nifi.ops
 
 import java.io._
 import java.nio.file.Path
@@ -11,7 +7,7 @@ import java.util.regex.Pattern
 import org.apache.nifi.flowfile.FlowFile
 import org.apache.nifi.processor._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /** Provides convenience methods from ProcessSession related to FlowFile */
 class FlowFileOps(val flowFile: FlowFile) extends AnyVal {

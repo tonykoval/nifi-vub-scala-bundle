@@ -8,7 +8,7 @@ import org.scalatest.{FunSpec, Matchers}
 
 import sk.vub.nifi.processors.SplitRecordsToAttributes._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 class SplitRecordToAttributesSpec extends FunSpec with Matchers {
 

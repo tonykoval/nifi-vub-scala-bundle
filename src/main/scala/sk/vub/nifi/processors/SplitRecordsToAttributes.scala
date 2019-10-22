@@ -13,7 +13,7 @@ import sk.vub.nifi.ops._
 import sk.vub.nifi.{FlowFileNotNull, ScalaProcessor, _}
 import sk.vub.nifi.processors.SplitRecordsToAttributes._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 @Tags(Array("split", "record", "attributes"))
 @InputRequirement(Requirement.INPUT_REQUIRED)

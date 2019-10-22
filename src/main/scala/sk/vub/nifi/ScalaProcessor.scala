@@ -7,7 +7,7 @@ import org.apache.nifi.logging.ComponentLog
 import org.apache.nifi.processor._
 import org.apache.nifi.processor.util.StandardValidators
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 abstract class ScalaProcessor extends AbstractProcessor {
 
