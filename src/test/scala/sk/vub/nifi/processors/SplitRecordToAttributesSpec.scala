@@ -4,7 +4,7 @@ import org.apache.nifi.json.JsonTreeReader
 import org.apache.nifi.serialization.record.MockRecordParser
 import org.apache.nifi.util.TestRunners
 import org.scalatest.{FunSpec, Matchers}
-import sk.vub.nifi.processors.SplitRecordsToAttributes._
+import sk.vub.nifi.processors.SplitRecordToAttributes._
 
 import scala.jdk.CollectionConverters._
 
@@ -24,7 +24,7 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
         |]
       """.stripMargin
 
-    val processor = new SplitRecordsToAttributes
+    val processor = new SplitRecordToAttributes
     val runner = TestRunners.newTestRunner(processor)
 
     val readerService = new MockRecordParser
@@ -80,7 +80,7 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
         |]
       """.stripMargin
 
-    val processor = new SplitRecordsToAttributes
+    val processor = new SplitRecordToAttributes
     val runner = TestRunners.newTestRunner(processor)
 
     val readerService = new MockRecordParser
@@ -110,6 +110,70 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
       flowFile.assertAttributeExists("null")
       flowFile.assertAttributeEquals("record.count", "2")
       flowFile.assertAttributeEquals("fragment.count", "2")
+    }
+  }
+
+  it("complex record - json") {
+    val in: String =
+      """
+        |[{
+        |	"id": 1,
+        |	"name": "John Doe",
+        |	"address": "123 My Street",
+        |	"city": "My City",
+        |	"state": "MS",
+        |	"zipCode": "11111",
+        |	"country": "USA",
+        |	"accounts": [{
+        |		"id": 42,
+        |		"balance": 4750.89
+        |	}, {
+        |		"id": 43,
+        |		"balance": 48212.38
+        |	}]
+        |},
+        |{
+        |	"id": 2,
+        |	"name": "Jane Doe",
+        |	"address": "345 My Street",
+        |	"city": "Her City",
+        |	"state": "NY",
+        |	"zipCode": "22222",
+        |	"country": "USA",
+        |	"accounts": [{
+        |		"id": 45,
+        |		"balance": 6578.45
+        |	}, {
+        |		"id": 46,
+        |		"balance": 34567.21
+        |	}]
+        |}]
+        |""".stripMargin
+
+    val processor = new SplitRecordToAttributes
+    val runner = TestRunners.newTestRunner(processor)
+
+    val readerService = new MockRecordParser
+
+    runner.addControllerService("reader", readerService)
+    runner.enableControllerService(readerService)
+    runner.setValidateExpressionUsage(false)
+
+    val jsonReader = new JsonTreeReader
+    runner.addControllerService("reader", jsonReader)
+    runner.enableControllerService(jsonReader)
+
+    runner.setProperty(P.recordReader, "reader")
+
+    runner.enqueue(in)
+    runner.run()
+
+    runner.assertTransferCount(R.splits, 2)
+    runner.assertTransferCount(R.failure, 0)
+    runner.assertTransferCount(R.original, 1)
+
+    for (flowFile <- runner.getFlowFilesForRelationship(R.splits).asScala) {
+      println(flowFile.getAttributes.asScala)
     }
   }
 }

@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>SplitRecordToAttributes</title>
+
+        <link rel="stylesheet" href="../../../../../css/component-usage.css" type="text/css" />
+    </head>
+
+    <body>
+    	<h2>Examples</h2>
+
+    	<h3>EXTRACT mode</h3>
+
+    	<p>
+    		To better understand how this Processor works, we will lay out a few examples. For the sake of these examples, let's assume that our input
+    		data is JSON formatted and looks like this:
+    	</p>
+
+<code>
+<pre>
+[{
+	"id": 1,
+	"name": "John Doe",
+	"address": "123 My Street",
+	"city": "My City",
+	"state": "MS",
+	"zipCode": "11111",
+	"country": "USA",
+	"accounts": [{
+		"id": 42,
+		"balance": 4750.89
+	}, {
+		"id": 43,
+		"balance": 48212.38
+	}]
+},
+{
+	"id": 2,
+	"name": "Jane Doe",
+	"address": "345 My Street",
+	"city": "Her City",
+	"state": "NY",
+	"zipCode": "22222",
+	"country": "USA",
+	"accounts": [{
+		"id": 45,
+		"balance": 6578.45
+	}, {
+		"id": 46,
+		"balance": 34567.21
+	}]
+}]
+</pre>
+</code>
+
+
+    	<h4>Example 1 - Extracting without parent fields</h4>
+
+    	<p>
+    		For this case, we want to create one record per <code>account</code> and we don't care about
+    		the other fields. We'll add a dynamic property "path" set to <code>/accounts</code>. The resulting
+    		flow file will contain 4 records and will look like (assuming the Record Writer schema is correctly set):
+    	</p>
+
+<code>
+<pre>
+[{
+	"id": 42,
+	"balance": 4750.89
+}, {
+	"id": 43,
+	"balance": 48212.38
+}, {
+	"id": 45,
+	"balance": 6578.45
+}, {
+	"id": 46,
+	"balance": 34567.21
+}]
+</pre>
+</code>
+
+
+    	<h4>Example 2 - Extracting with parent fields</h4>
+
+    	<p>
+    		Now, if we set the property "Include parent fields" to true, this will recursively include
+    		the parent fields into the output records assuming the Record Writer schema allows it. In
+    		case multiple fields have the same name (like we have in this example for <code>id</code>),
+    		the child field will have the priority over all the parent fields sharing the same name. In
+    		this case, the <code>id</code> of the array <code>accounts</code> will be saved in the
+    		forked records. The resulting flow file will contain 4 records and will look like:
+    	</p>
+
+<code>
+<pre>
+[{
+	"name": "John Doe",
+	"address": "123 My Street",
+	"city": "My City",
+	"state": "MS",
+	"zipCode": "11111",
+	"country": "USA",
+	"id": 42,
+	"balance": 4750.89
+}, {
+	"name": "John Doe",
+	"address": "123 My Street",
+	"city": "My City",
+	"state": "MS",
+	"zipCode": "11111",
+	"country": "USA",
+	"id": 43,
+	"balance": 48212.38
+}, {
+	"name": "Jane Doe",
+	"address": "345 My Street",
+	"city": "Her City",
+	"state": "NY",
+	"zipCode": "22222",
+	"country": "USA",
+	"id": 45,
+	"balance": 6578.45
+}, {
+	"name": "Jane Doe",
+	"address": "345 My Street",
+	"city": "Her City",
+	"state": "NY",
+	"zipCode": "22222",
+	"country": "USA",
+	"id": 46,
+	"balance": 34567.21
+}]
+</pre>
+</code>
+
+
+    	<h4>Example 3 - Multi-nested arrays</h4>
+
+    	<p>
+    		Now let's say that the input record contains multi-nested arrays like the below example:
+    	</p>
+
+<code>
+<pre>
+[{
+	"id": 1,
+	"name": "John Doe",
+	"address": "123 My Street",
+	"city": "My City",
+	"state": "MS",
+	"zipCode": "11111",
+	"country": "USA",
+	"accounts": [{
+		"id": 42,
+		"balance": 4750.89,
+		"transactions": [{
+			"id": 5,
+			"amount": 150.31
+		},
+		{
+			"id": 6,
+			"amount": -15.31
+		}]
+	}, {
+		"id": 43,
+		"balance": 48212.38,
+		"transactions": [{
+			"id": 7,
+			"amount": 36.78
+		},
+		{
+			"id": 8,
+			"amount": -21.34
+		}]
+	}]
+}]
+</pre>
+</code>
+
+    	<p>
+    		If we want to have one record per <code>transaction</code> for each <code>account</code>, then
+    		the Record Path should be set to <code>/accounts[*]/transactions</code>. If we have the following
+    		schema for our Record Reader:
+    	</p>
+
+<code>
+<pre>
+{
+    "type" : "record",
+    "name" : "bank",
+    "fields" : [ {
+      "name" : "id",
+      "type" : "int"
+    }, {
+      "name" : "name",
+      "type" : "string"
+    }, {
+      "name" : "address",
+      "type" : "string"
+    }, {
+      "name" : "city",
+      "type" : "string"
+    }, {
+      "name" : "state",
+      "type" : "string"
+    }, {
+      "name" : "zipCode",
+      "type" : "string"
+    }, {
+      "name" : "country",
+      "type" : "string"
+    }, {
+      "name" : "accounts",
+      "type" : {
+        "type" : "array",
+        "items" : {
+          "type" : "record",
+          "name" : "accounts",
+          "fields" : [ {
+            "name" : "id",
+            "type" : "int"
+          }, {
+            "name" : "balance",
+            "type" : "double"
+          }, {
+            "name" : "transactions",
+            "type" : {
+              "type" : "array",
+              "items" : {
+                "type" : "record",
+                "name" : "transactions",
+                "fields" : [ {
+                  "name" : "id",
+                  "type" : "int"
+                }, {
+                  "name" : "amount",
+                  "type" : "double"
+                } ]
+              }
+            }
+          } ]
+        }
+      }
+    } ]
+}
+</pre>
+</code>
+
+    	<p>
+    		And if we have the following schema for our Record Writer:
+    	</p>
+
+<code>
+<pre>
+{
+    "type" : "record",
+    "name" : "bank",
+    "fields" : [ {
+      "name" : "id",
+      "type" : "int"
+    }, {
+      "name" : "name",
+      "type" : "string"
+    }, {
+      "name" : "address",
+      "type" : "string"
+    }, {
+      "name" : "city",
+      "type" : "string"
+    }, {
+      "name" : "state",
+      "type" : "string"
+    }, {
+      "name" : "zipCode",
+      "type" : "string"
+    }, {
+      "name" : "country",
+      "type" : "string"
+    }, {
+      "name" : "amount",
+      "type" : "double"
+    }, {
+      "name" : "balance",
+      "type" : "double"
+    } ]
+}
+</pre>
+</code>
+
+    	<p>
+    		Then, if we include the parent fields, we'll have 4 records as below:
+    	</p>
+
+<code>
+<pre>
+[ {
+  "id" : 5,
+  "name" : "John Doe",
+  "address" : "123 My Street",
+  "city" : "My City",
+  "state" : "MS",
+  "zipCode" : "11111",
+  "country" : "USA",
+  "amount" : 150.31,
+  "balance" : 4750.89
+}, {
+  "id" : 6,
+  "name" : "John Doe",
+  "address" : "123 My Street",
+  "city" : "My City",
+  "state" : "MS",
+  "zipCode" : "11111",
+  "country" : "USA",
+  "amount" : -15.31,
+  "balance" : 4750.89
+}, {
+  "id" : 7,
+  "name" : "John Doe",
+  "address" : "123 My Street",
+  "city" : "My City",
+  "state" : "MS",
+  "zipCode" : "11111",
+  "country" : "USA",
+  "amount" : 36.78,
+  "balance" : 48212.38
+}, {
+  "id" : 8,
+  "name" : "John Doe",
+  "address" : "123 My Street",
+  "city" : "My City",
+  "state" : "MS",
+  "zipCode" : "11111",
+  "country" : "USA",
+  "amount" : -21.34,
+  "balance" : 48212.38
+} ]
+</pre>
+</code>
+
+    	<h3>SPLIT mode</h3>
+
+	   	<h4>Example</h4>
+
+    	<p>
+    		Assuming we have the below data and we added a property "path" set to <code>/accounts</code>:
+    	</p>
+
+<code>
+<pre>
+[{
+	"id": 1,
+	"name": "John Doe",
+	"address": "123 My Street",
+	"city": "My City",
+	"state": "MS",
+	"zipCode": "11111",
+	"country": "USA",
+	"accounts": [{
+		"id": 42,
+		"balance": 4750.89
+	}, {
+		"id": 43,
+		"balance": 48212.38
+	}]
+},
+{
+	"id": 2,
+	"name": "Jane Doe",
+	"address": "345 My Street",
+	"city": "Her City",
+	"state": "NY",
+	"zipCode": "22222",
+	"country": "USA",
+	"accounts": [{
+		"id": 45,
+		"balance": 6578.45
+	}, {
+		"id": 46,
+		"balance": 34567.21
+	}]
+}]
+</pre>
+</code>
+
+    	<p>
+    		Then we'll get 4 records as below:
+    	</p>
+
+<code>
+<pre>
+[{
+	"id": 1,
+	"name": "John Doe",
+	"address": "123 My Street",
+	"city": "My City",
+	"state": "MS",
+	"zipCode": "11111",
+	"country": "USA",
+	"accounts": [{
+		"id": 42,
+		"balance": 4750.89
+	}]
+},
+{
+	"id": 1,
+	"name": "John Doe",
+	"address": "123 My Street",
+	"city": "My City",
+	"state": "MS",
+	"zipCode": "11111",
+	"country": "USA",
+	"accounts": [{
+		"id": 43,
+		"balance": 48212.38
+	}]
+},
+{
+	"id": 2,
+	"name": "Jane Doe",
+	"address": "345 My Street",
+	"city": "Her City",
+	"state": "NY",
+	"zipCode": "22222",
+	"country": "USA",
+	"accounts": [{
+		"id": 45,
+		"balance": 6578.45
+	}]
+},
+{
+	"id": 2,
+	"name": "Jane Doe",
+	"address": "345 My Street",
+	"city": "Her City",
+	"state": "NY",
+	"zipCode": "22222",
+	"country": "USA",
+	"accounts": [{
+		"id": 46,
+		"balance": 34567.21
+	}]
+}]
+</pre>
+</code>
+
+	</body>
+</html>

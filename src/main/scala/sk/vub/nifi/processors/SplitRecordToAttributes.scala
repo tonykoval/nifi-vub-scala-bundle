@@ -12,23 +12,29 @@ import org.apache.nifi.processor.{ProcessContext, ProcessSession, Relationship}
 import org.apache.nifi.serialization.RecordReaderFactory
 import org.apache.nifi.serialization.record.Record
 import sk.vub.nifi.ops._
-import sk.vub.nifi.processors.SplitRecordsToAttributes._
+import sk.vub.nifi.processors.SplitRecordToAttributes._
 import sk.vub.nifi.{FlowFileNotNull, ScalaProcessor, _}
 
 import scala.jdk.CollectionConverters._
 
 @Tags(Array("split", "record", "attribute", "json", "avro", "csv"))
 @InputRequirement(Requirement.INPUT_REQUIRED)
-@CapabilityDescription("Splits up an input FlowFile that is in a record-oriented data format into multiple smaller FlowFiles and content is also split into attributes as text")
+@CapabilityDescription("Splits up an input FlowFile that is in a record-oriented data format into multiple smaller " +
+  "FlowFiles and content is also split into attributes as text. See examples in the additional details documentation " +
+  "of this processor.")
 @WritesAttributes(Array(
-      new WritesAttribute(attribute = V.RecordCount, description = "The number of records in the FlowFile. This is added to FlowFiles that are routed to the 'splits' Relationship."),
-      new WritesAttribute(attribute = V.FragmentIndexKey, description = "All split FlowFiles produced from the same parent FlowFile will have the same randomly generated UUID added for this attribute"),
-      new WritesAttribute(attribute = V.FragmentIndexKey, description = "A one-up number that indicates the ordering of the split FlowFiles that were created from a single parent FlowFile"),
-      new WritesAttribute(attribute = V.FragmentCountKey, description = "The number of split FlowFiles generated from the parent FlowFile"),
+      new WritesAttribute(attribute = V.RecordCount, description = "The number of records in the FlowFile. This is " +
+        "added to FlowFiles that are routed to the 'splits' Relationship."),
+      new WritesAttribute(attribute = V.FragmentIndexKey, description = "All split FlowFiles produced from the same " +
+        "parent FlowFile will have the same randomly generated UUID added for this attribute"),
+      new WritesAttribute(attribute = V.FragmentIndexKey, description = "A one-up number that indicates the ordering " +
+        "of the split FlowFiles that were created from a single parent FlowFile"),
+      new WritesAttribute(attribute = V.FragmentCountKey, description = "The number of split FlowFiles generated from" +
+        " the parent FlowFile"),
       new WritesAttribute(attribute = V.SegmentOriginalFilenameKey, description = "The filename of the parent FlowFile")
   )
 )
-class SplitRecordsToAttributes extends ScalaProcessor with FlowFileNotNull {
+class SplitRecordToAttributes extends ScalaProcessor with FlowFileNotNull {
 
   def properties: List[PropertyDescriptor] = List (P.recordReader, P.evaluateContent)
 
@@ -80,7 +86,7 @@ class SplitRecordsToAttributes extends ScalaProcessor with FlowFileNotNull {
   }
 }
 
-object SplitRecordsToAttributes {
+object SplitRecordToAttributes {
   object P {
     val recordReader: PropertyDescriptor = new PropertyDescriptor.Builder()
       .name("record-reader")
@@ -103,14 +109,19 @@ object SplitRecordsToAttributes {
   object R {
     val original: Relationship = new Relationship.Builder()
       .name("original")
+      .description("Upon successfully splitting an input FlowFile, the original FlowFile will be sent to" +
+        " this relationship.")
       .build()
 
     val splits: Relationship = new Relationship.Builder()
       .name("splits")
+      .description("The individual 'segments' of the original FlowFile will be routed to this relationship.")
       .build()
 
     val failure: Relationship = new Relationship.Builder()
       .name("failure")
+      .description("If a FlowFile cannot be transformed from the configured input format to the configured " +
+        "output format, the unchanged FlowFile will be routed to this relationship.")
       .build()
   }
 
