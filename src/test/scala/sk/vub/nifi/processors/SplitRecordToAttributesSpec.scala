@@ -51,8 +51,10 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
       flowFile.assertAttributeEquals("id", "123")
       flowFile.assertAttributeEquals("date", "2017-07-07")
       flowFile.assertAttributeEquals("boolean", "true")
-      flowFile.assertAttributeEquals("arrays", "[1, 2, 3]")
-      flowFile.assertAttributeEquals("null", null)
+      flowFile.assertAttributeEquals("arrays[0]", "1")
+      flowFile.assertAttributeEquals("arrays[1]", "2")
+      flowFile.assertAttributeEquals("arrays[2]", "3")
+      flowFile.assertAttributeEquals("null", "")
       flowFile.assertAttributeEquals("record.count", "1")
       flowFile.assertAttributeEquals("fragment.count", "1")
       flowFile.assertAttributeEquals("fragment.index", "0")
@@ -106,7 +108,9 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
       flowFile.assertAttributeExists("id")
       flowFile.assertAttributeExists("date")
       flowFile.assertAttributeExists("boolean")
-      flowFile.assertAttributeExists("arrays")
+      flowFile.assertAttributeExists("arrays[0]")
+      flowFile.assertAttributeExists("arrays[1]")
+      flowFile.assertAttributeExists("arrays[2]")
       flowFile.assertAttributeExists("null")
       flowFile.assertAttributeEquals("record.count", "2")
       flowFile.assertAttributeEquals("fragment.count", "2")
@@ -131,22 +135,6 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
         |		"id": 43,
         |		"balance": 48212.38
         |	}]
-        |},
-        |{
-        |	"id": 2,
-        |	"name": "Jane Doe",
-        |	"address": "345 My Street",
-        |	"city": "Her City",
-        |	"state": "NY",
-        |	"zipCode": "22222",
-        |	"country": "USA",
-        |	"accounts": [{
-        |		"id": 45,
-        |		"balance": 6578.45
-        |	}, {
-        |		"id": 46,
-        |		"balance": 34567.21
-        |	}]
         |}]
         |""".stripMargin
 
@@ -168,12 +156,25 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
     runner.enqueue(in)
     runner.run()
 
-    runner.assertTransferCount(R.splits, 2)
+    runner.assertTransferCount(R.splits, 1)
     runner.assertTransferCount(R.failure, 0)
     runner.assertTransferCount(R.original, 1)
 
     for (flowFile <- runner.getFlowFilesForRelationship(R.splits).asScala) {
-      println(flowFile.getAttributes.asScala)
+      flowFile.assertAttributeEquals("id", "1")
+      flowFile.assertAttributeEquals("name", "John Doe")
+      flowFile.assertAttributeEquals("address", "123 My Street")
+      flowFile.assertAttributeEquals("city", "My City")
+      flowFile.assertAttributeEquals("state", "MS")
+      flowFile.assertAttributeEquals("zipCode", "11111")
+      flowFile.assertAttributeEquals("country", "USA")
+      flowFile.assertAttributeEquals("accounts[0].id", "42")
+      flowFile.assertAttributeEquals("accounts[0].balance", "4750.89")
+      flowFile.assertAttributeEquals("accounts[1].id", "43")
+      flowFile.assertAttributeEquals("accounts[1].balance", "48212.38")
+      flowFile.assertAttributeEquals("record.count", "1")
+      flowFile.assertAttributeEquals("fragment.count", "1")
+      flowFile.assertAttributeEquals("fragment.index", "0")
     }
   }
 }

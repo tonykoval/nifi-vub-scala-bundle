@@ -2,6 +2,7 @@ package sk.vub.nifi.processors
 
 import java.util.UUID
 
+import io.circe.Json
 import org.apache.nifi.annotation.behavior.InputRequirement.Requirement
 import org.apache.nifi.annotation.behavior.{InputRequirement, WritesAttribute, WritesAttributes}
 import org.apache.nifi.annotation.documentation.{CapabilityDescription, Tags}
@@ -14,8 +15,6 @@ import org.apache.nifi.serialization.record.Record
 import sk.vub.nifi.ops._
 import sk.vub.nifi.processors.SplitRecordToAttributes._
 import sk.vub.nifi.{FlowFileNotNull, ScalaProcessor, _}
-
-import scala.jdk.CollectionConverters._
 
 @Tags(Array("split", "record", "attribute", "json", "avro", "csv"))
 @InputRequirement(Requirement.INPUT_REQUIRED)
@@ -52,26 +51,28 @@ class SplitRecordToAttributes extends ScalaProcessor with FlowFileNotNull {
           val records = iterator.toList
           val recordCount = records.size
           records.zipWithIndex.foreach { case (record, fragmentIndex) =>
-            val attributes: Map[String, String] = (for {
-              rawField <- record.getRawFieldNames.asScala
-            } yield {
-              if (evaluateContent) {
-                rawField -> context
-                  .newPropertyValue(record.getAsString(rawField))
-                  .evaluateAttributeExpressions(flowFile)
-                  .getValue
-              } else rawField -> record.getAsString(rawField)
-            }).toMap
+            parseString(flattenJson(convertRecordToJsonString(logger, record))).asObject.foreach { jsonObject =>
+              val attributes: Map[String, String] = (for {
+                k <- jsonObject.keys
+              } yield {
+                if (evaluateContent) {
+                  k -> context
+                    .newPropertyValue(jsonToString(jsonObject(k).getOrElse(Json.Null)).getOrElse(""))
+                    .evaluateAttributeExpressions(flowFile)
+                    .getValue
+                } else k -> jsonToString(jsonObject(k).getOrElse(Json.Null)).getOrElse("")
+              }).toMap
 
-            flowFile
-              .createChild()
-              .putAttribute(V.RecordCount, recordCount.toString)
-              .putAttribute(V.FragmentIdKey, fragmentId)
-              .putAttribute(V.FragmentCountKey, recordCount.toString)
-              .putAttribute(V.FragmentIndexKey, fragmentIndex.toString)
-              .putAttribute(V.SegmentOriginalFilenameKey, flowFile.getAttribute(CoreAttributes.FILENAME.key()))
-              .putAllAttributes(attributes)
-              .transfer(R.splits)
+              flowFile
+                .createChild()
+                .putAttribute(V.RecordCount, recordCount.toString)
+                .putAttribute(V.FragmentIdKey, fragmentId)
+                .putAttribute(V.FragmentCountKey, recordCount.toString)
+                .putAttribute(V.FragmentIndexKey, fragmentIndex.toString)
+                .putAttribute(V.SegmentOriginalFilenameKey, flowFile.getAttribute(CoreAttributes.FILENAME.key()))
+                .putAllAttributes(attributes)
+                .transfer(R.splits)
+            }
           }
         }
       }
