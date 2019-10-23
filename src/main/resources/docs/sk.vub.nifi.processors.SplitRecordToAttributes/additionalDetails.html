@@ -1,97 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>SplitRecordToAttributes</title>
+<head>
+    <meta charset="utf-8"/>
+    <title>SplitRecordToAttributes</title>
 
-        <link rel="stylesheet" href="../../../../../css/component-usage.css" type="text/css" />
-    </head>
+	<link rel="stylesheet" href="../../../../../css/component-usage.css" type="text/css" />
+</head>
 
-    <body>
-    	<h2>Examples</h2>
+<body>
+<h1>SplitRecordToAttributes</h1>
 
-    	<h3>EXTRACT mode</h3>
+<h2>Examples</h2>
 
-    	<p>
-    		To better understand how this Processor works, we will lay out a few examples. For the sake of these examples, let's assume that our input
-    		data is JSON formatted and looks like this:
-    	</p>
+<p>
+    To better understand how this Processor works, we will lay out a few examples.
+</p>
+
+<h4>Example 1 - simple json</h4>
+
+<p>
+    Input (json)
+</p>
 
 <code>
 <pre>
-[{
-	"id": 1,
-	"name": "John Doe",
-	"address": "123 My Street",
-	"city": "My City",
-	"state": "MS",
-	"zipCode": "11111",
-	"country": "USA",
-	"accounts": [{
-		"id": 42,
-		"balance": 4750.89
-	}, {
-		"id": 43,
-		"balance": 48212.38
-	}]
-},
+[
 {
-	"id": 2,
-	"name": "Jane Doe",
-	"address": "345 My Street",
-	"city": "Her City",
-	"state": "NY",
-	"zipCode": "22222",
-	"country": "USA",
-	"accounts": [{
-		"id": 45,
-		"balance": 6578.45
-	}, {
-		"id": 46,
-		"balance": 34567.21
-	}]
-}]
+  "id": 123,
+  "date": "2017-07-07",
+  "boolean": true,
+  "arrays": [1,2,3],
+  "null": null
+}
+]
 </pre>
 </code>
+<p>
+    Result (empty content)
+</p>
+
+<table>
+    <tr>
+        <th>Attribute name</th>
+        <th>Attribute Value</th>
+    </tr>
+    <tr>
+        <td>id</td>
+        <td>123</td>
+    </tr>
+    <tr>
+        <td>date</td>
+        <td>2017-07-07</td>
+    </tr>
+    <tr>
+        <td>boolean</td>
+        <td>true</td>
+    </tr>
+	<tr>
+		<td>arrays[0]</td>
+		<td>1</td>
+	</tr>
+</table>
 
 
-    	<h4>Example 1 - Extracting without parent fields</h4>
+<h4>Example 2 - Extracting with parent fields</h4>
 
-    	<p>
-    		For this case, we want to create one record per <code>account</code> and we don't care about
-    		the other fields. We'll add a dynamic property "path" set to <code>/accounts</code>. The resulting
-    		flow file will contain 4 records and will look like (assuming the Record Writer schema is correctly set):
-    	</p>
-
-<code>
-<pre>
-[{
-	"id": 42,
-	"balance": 4750.89
-}, {
-	"id": 43,
-	"balance": 48212.38
-}, {
-	"id": 45,
-	"balance": 6578.45
-}, {
-	"id": 46,
-	"balance": 34567.21
-}]
-</pre>
-</code>
-
-
-    	<h4>Example 2 - Extracting with parent fields</h4>
-
-    	<p>
-    		Now, if we set the property "Include parent fields" to true, this will recursively include
-    		the parent fields into the output records assuming the Record Writer schema allows it. In
-    		case multiple fields have the same name (like we have in this example for <code>id</code>),
-    		the child field will have the priority over all the parent fields sharing the same name. In
-    		this case, the <code>id</code> of the array <code>accounts</code> will be saved in the
-    		forked records. The resulting flow file will contain 4 records and will look like:
-    	</p>
+<p>
+    Now, if we set the property "Include parent fields" to true, this will recursively include
+    the parent fields into the output records assuming the Record Writer schema allows it. In
+    case multiple fields have the same name (like we have in this example for <code>id</code>),
+    the child field will have the priority over all the parent fields sharing the same name. In
+    this case, the <code>id</code> of the array <code>accounts</code> will be saved in the
+    forked records. The resulting flow file will contain 4 records and will look like:
+</p>
 
 <code>
 <pre>
@@ -136,11 +117,11 @@
 </code>
 
 
-    	<h4>Example 3 - Multi-nested arrays</h4>
+<h4>Example 3 - Multi-nested arrays</h4>
 
-    	<p>
-    		Now let's say that the input record contains multi-nested arrays like the below example:
-    	</p>
+<p>
+    Now let's say that the input record contains multi-nested arrays like the below example:
+</p>
 
 <code>
 <pre>
@@ -179,11 +160,11 @@
 </pre>
 </code>
 
-    	<p>
-    		If we want to have one record per <code>transaction</code> for each <code>account</code>, then
-    		the Record Path should be set to <code>/accounts[*]/transactions</code>. If we have the following
-    		schema for our Record Reader:
-    	</p>
+<p>
+    If we want to have one record per <code>transaction</code> for each <code>account</code>, then
+    the Record Path should be set to <code>/accounts[*]/transactions</code>. If we have the following
+    schema for our Record Reader:
+</p>
 
 <code>
 <pre>
@@ -248,9 +229,9 @@
 </pre>
 </code>
 
-    	<p>
-    		And if we have the following schema for our Record Writer:
-    	</p>
+<p>
+    And if we have the following schema for our Record Writer:
+</p>
 
 <code>
 <pre>
@@ -289,9 +270,9 @@
 </pre>
 </code>
 
-    	<p>
-    		Then, if we include the parent fields, we'll have 4 records as below:
-    	</p>
+<p>
+    Then, if we include the parent fields, we'll have 4 records as below:
+</p>
 
 <code>
 <pre>
@@ -339,13 +320,13 @@
 </pre>
 </code>
 
-    	<h3>SPLIT mode</h3>
+<h3>SPLIT mode</h3>
 
-	   	<h4>Example</h4>
+<h4>Example</h4>
 
-    	<p>
-    		Assuming we have the below data and we added a property "path" set to <code>/accounts</code>:
-    	</p>
+<p>
+    Assuming we have the below data and we added a property "path" set to <code>/accounts</code>:
+</p>
 
 <code>
 <pre>
@@ -384,9 +365,9 @@
 </pre>
 </code>
 
-    	<p>
-    		Then we'll get 4 records as below:
-    	</p>
+<p>
+    Then we'll get 4 records as below:
+</p>
 
 <code>
 <pre>
@@ -445,5 +426,5 @@
 </pre>
 </code>
 
-	</body>
+</body>
 </html>
