@@ -1,6 +1,6 @@
 enablePlugins(NarPlugin)
 
-name := "nifi-processor-scala-bundle"
+name := "nifi-vub-scala-bundle"
 organization := "sk.vub"
 version := "0.1"
 
