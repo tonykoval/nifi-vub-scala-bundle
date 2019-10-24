@@ -35,13 +35,12 @@ import sk.vub.nifi.{FlowFileNotNull, ScalaProcessor, _}
 )
 class SplitRecordToAttributes extends ScalaProcessor with FlowFileNotNull {
 
-  def properties: List[PropertyDescriptor] = List (P.recordReader, P.evaluateContent)
+  def properties: List[PropertyDescriptor] = List (P.recordReader)
 
   def relationships: Set[Relationship] = Set(R.failure, R.original, R.splits)
 
   def onTrigger(flowFile: FlowFile)(implicit context: ProcessContext, session: ProcessSession): Unit = {
     val readerFactory = P.recordReader.asControllerService[RecordReaderFactory]
-    val evaluateContent = P.evaluateContent.evaluate(flowFile).get.toBoolean
     val fragmentId = UUID.randomUUID().toString;
 
     withThrowableAsEither(()) { _ =>
@@ -55,12 +54,7 @@ class SplitRecordToAttributes extends ScalaProcessor with FlowFileNotNull {
               val attributes: Map[String, String] = (for {
                 k <- jsonObject.keys
               } yield {
-                if (evaluateContent) {
-                  k -> context
-                    .newPropertyValue(jsonToString(jsonObject(k).getOrElse(Json.Null)).getOrElse(""))
-                    .evaluateAttributeExpressions(flowFile)
-                    .getValue
-                } else k -> jsonToString(jsonObject(k).getOrElse(Json.Null)).getOrElse("")
+                k -> jsonToString(jsonObject(k).getOrElse(Json.Null)).getOrElse("")
               }).toMap
 
               flowFile
@@ -94,15 +88,6 @@ object SplitRecordToAttributes {
       .displayName("Record Reader")
       .description("Specifies the Controller Service to use for reading incoming data")
       .identifiesControllerService(classOf[RecordReaderFactory])
-      .required(true)
-      .build()
-
-    val evaluateContent: PropertyDescriptor = new PropertyDescriptor.Builder()
-      .name("evaluate-content")
-      .displayName("Evaluate Content")
-      .description("Evaluate Content")
-      .allowableValues("true", "false")
-      .defaultValue("false")
       .required(true)
       .build()
   }

@@ -6,7 +6,37 @@
     <link rel="stylesheet" href="css/component-usage.css" type="text/css"/>
 </head>
 <body>
+<h1 id="nameHeader" >SplitRecordToAttributes</h1>
+<h2>Description: </h2>
+<p>Splits up an input FlowFile that is in a record-oriented data format into multiple smaller FlowFiles and content is
+    also split into attributes as text. See examples in the additional details documentation of this processor.</p>
+
 <div w3-include-html="../src/main/resources/docs/sk.vub.nifi.processors.SplitRecordToAttributes/additionalDetails.html"></div>
+
+<h3>Tags: </h3>
+<p>split, record, attribute, json, avro, csv</p>
+<h3>Properties: </h3>
+<p>In the list below, the names of required properties appear in <strong>bold</strong>. Any other properties (not in
+    bold) are considered optional. The table also indicates any default values.</p>
+<table id="properties">
+    <tr>
+        <th>Name</th>
+        <th>Default Value</th>
+        <th>Allowable Values</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td id="name"><strong>Record Reader</strong></td>
+        <td id="default-value"></td>
+        <td id="allowable-values"><strong>Controller Service API: </strong><br/>RecordReaderFactory<br/>No
+            implementations found.
+        </td>
+        <td id="description">Specifies the Controller Service to use for reading incoming data</td>
+    </tr>
+</table>
+<h3>State management: </h3>This component does not store state.<h3>Restricted: </h3>This component is not restricted.
+<h3>Input requirement: </h3>This component requires an incoming relationship.<h3>System Resource Considerations:</h3>
+None specified.
 </body>
 <script>
     function includeHTML() {

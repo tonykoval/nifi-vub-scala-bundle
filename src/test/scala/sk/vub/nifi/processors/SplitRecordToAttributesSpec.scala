@@ -10,7 +10,7 @@ import scala.jdk.CollectionConverters._
 
 class SplitRecordToAttributesSpec extends FunSpec with Matchers {
 
-  it("simple record - json") {
+  it("json - one simple record") {
     val in: String =
       """
         |[
@@ -38,7 +38,6 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
     runner.enableControllerService(jsonReader)
 
     runner.setProperty(P.recordReader, "reader")
-    runner.setProperty(P.evaluateContent, "false")
 
     runner.enqueue(in)
     runner.run()
@@ -61,7 +60,7 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
     }
   }
 
-  it("two records - json") {
+  it("json - two simple records") {
     val in: String =
       """
         |[
@@ -117,7 +116,7 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
     }
   }
 
-  it("complex record - json") {
+  it("json - nested object") {
     val in: String =
       """
         |[{
@@ -176,5 +175,20 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
       flowFile.assertAttributeEquals("fragment.count", "1")
       flowFile.assertAttributeEquals("fragment.index", "0")
     }
+  }
+
+  // TODO: add this functionality to sbt-nifi-nar plugin
+  it("generate documentation") {
+    import org.apache.nifi.documentation.html.HtmlDocumentationWriter
+    import org.apache.nifi.nar.StandardExtensionDiscoveringManager
+    import java.io.ByteArrayOutputStream
+
+    val extensionManager = new StandardExtensionDiscoveringManager()
+    val processor = new SplitRecordToAttributes
+    val htmlDocumentationWriter = new HtmlDocumentationWriter(extensionManager)
+    val baos = new ByteArrayOutputStream()
+    htmlDocumentationWriter.write(processor, baos, false)
+
+    new String(baos.toByteArray)
   }
 }

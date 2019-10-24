@@ -8,18 +8,22 @@
 </head>
 
 <body>
-<h1>SplitRecordToAttributes</h1>
-
 <h2>Examples</h2>
 
 <p>
     To better understand how this Processor works, we will lay out a few examples.
+
+    <ul id="menu">
+        <li><a href="#example1">Example 1 - One simple record</a></li>
+        <li><a href="#example2">Example 2 - Two simple records</a></li>
+        <li><a href="#example3">Example 3 - Nested object </a></li>
+    </ul>
 </p>
 
-<h4>Example 1 - simple json</h4>
+<h4 id="example1">Example 1 - One simple record</h4>
 
 <p>
-    Input (json)
+    Input is flowfile (JSON):
 </p>
 
 <code>
@@ -36,7 +40,7 @@
 </pre>
 </code>
 <p>
-    Result (empty content)
+    Result is flowfile (empty content) with attributes:
 </p>
 
 <table>
@@ -60,272 +64,162 @@
 		<td>arrays[0]</td>
 		<td>1</td>
 	</tr>
+    <tr>
+        <td>arrays[1]</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>arrays[2]</td>
+        <td>3</td>
+    </tr>
+    <tr>
+        <td>null</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>record.count</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>fragment.count</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>fragment.index</td>
+        <td>0</td>
+    </tr>
 </table>
 
-
-<h4>Example 2 - Extracting with parent fields</h4>
+<h4 id="example2">Example 2 - Two simple record</h4>
 
 <p>
-    Now, if we set the property "Include parent fields" to true, this will recursively include
-    the parent fields into the output records assuming the Record Writer schema allows it. In
-    case multiple fields have the same name (like we have in this example for <code>id</code>),
-    the child field will have the priority over all the parent fields sharing the same name. In
-    this case, the <code>id</code> of the array <code>accounts</code> will be saved in the
-    forked records. The resulting flow file will contain 4 records and will look like:
+    Input is flowfile (JSON):
 </p>
 
 <code>
 <pre>
-[{
-	"name": "John Doe",
-	"address": "123 My Street",
-	"city": "My City",
-	"state": "MS",
-	"zipCode": "11111",
-	"country": "USA",
-	"id": 42,
-	"balance": 4750.89
-}, {
-	"name": "John Doe",
-	"address": "123 My Street",
-	"city": "My City",
-	"state": "MS",
-	"zipCode": "11111",
-	"country": "USA",
-	"id": 43,
-	"balance": 48212.38
-}, {
-	"name": "Jane Doe",
-	"address": "345 My Street",
-	"city": "Her City",
-	"state": "NY",
-	"zipCode": "22222",
-	"country": "USA",
-	"id": 45,
-	"balance": 6578.45
-}, {
-	"name": "Jane Doe",
-	"address": "345 My Street",
-	"city": "Her City",
-	"state": "NY",
-	"zipCode": "22222",
-	"country": "USA",
-	"id": 46,
-	"balance": 34567.21
-}]
-</pre>
-</code>
-
-
-<h4>Example 3 - Multi-nested arrays</h4>
-
-<p>
-    Now let's say that the input record contains multi-nested arrays like the below example:
-</p>
-
-<code>
-<pre>
-[{
-	"id": 1,
-	"name": "John Doe",
-	"address": "123 My Street",
-	"city": "My City",
-	"state": "MS",
-	"zipCode": "11111",
-	"country": "USA",
-	"accounts": [{
-		"id": 42,
-		"balance": 4750.89,
-		"transactions": [{
-			"id": 5,
-			"amount": 150.31
-		},
-		{
-			"id": 6,
-			"amount": -15.31
-		}]
-	}, {
-		"id": 43,
-		"balance": 48212.38,
-		"transactions": [{
-			"id": 7,
-			"amount": 36.78
-		},
-		{
-			"id": 8,
-			"amount": -21.34
-		}]
-	}]
-}]
-</pre>
-</code>
-
-<p>
-    If we want to have one record per <code>transaction</code> for each <code>account</code>, then
-    the Record Path should be set to <code>/accounts[*]/transactions</code>. If we have the following
-    schema for our Record Reader:
-</p>
-
-<code>
-<pre>
+[
 {
-    "type" : "record",
-    "name" : "bank",
-    "fields" : [ {
-      "name" : "id",
-      "type" : "int"
-    }, {
-      "name" : "name",
-      "type" : "string"
-    }, {
-      "name" : "address",
-      "type" : "string"
-    }, {
-      "name" : "city",
-      "type" : "string"
-    }, {
-      "name" : "state",
-      "type" : "string"
-    }, {
-      "name" : "zipCode",
-      "type" : "string"
-    }, {
-      "name" : "country",
-      "type" : "string"
-    }, {
-      "name" : "accounts",
-      "type" : {
-        "type" : "array",
-        "items" : {
-          "type" : "record",
-          "name" : "accounts",
-          "fields" : [ {
-            "name" : "id",
-            "type" : "int"
-          }, {
-            "name" : "balance",
-            "type" : "double"
-          }, {
-            "name" : "transactions",
-            "type" : {
-              "type" : "array",
-              "items" : {
-                "type" : "record",
-                "name" : "transactions",
-                "fields" : [ {
-                  "name" : "id",
-                  "type" : "int"
-                }, {
-                  "name" : "amount",
-                  "type" : "double"
-                } ]
-              }
-            }
-          } ]
-        }
-      }
-    } ]
-}
-</pre>
-</code>
-
-<p>
-    And if we have the following schema for our Record Writer:
-</p>
-
-<code>
-<pre>
+  "id": 123,
+  "date": "2017-07-07",
+  "boolean": true,
+  "arrays": [1,2,3],
+  "null": null
+},
 {
-    "type" : "record",
-    "name" : "bank",
-    "fields" : [ {
-      "name" : "id",
-      "type" : "int"
-    }, {
-      "name" : "name",
-      "type" : "string"
-    }, {
-      "name" : "address",
-      "type" : "string"
-    }, {
-      "name" : "city",
-      "type" : "string"
-    }, {
-      "name" : "state",
-      "type" : "string"
-    }, {
-      "name" : "zipCode",
-      "type" : "string"
-    }, {
-      "name" : "country",
-      "type" : "string"
-    }, {
-      "name" : "amount",
-      "type" : "double"
-    }, {
-      "name" : "balance",
-      "type" : "double"
-    } ]
+  "id": 456,
+  "date": "2016-06-06",
+  "boolean": false,
+  "arrays": [4,5,6],
+  "null": "not null"
 }
+]
 </pre>
 </code>
-
 <p>
-    Then, if we include the parent fields, we'll have 4 records as below:
+    Result is 2 flowfiles (empty content) with attributes:
 </p>
 
-<code>
-<pre>
-[ {
-  "id" : 5,
-  "name" : "John Doe",
-  "address" : "123 My Street",
-  "city" : "My City",
-  "state" : "MS",
-  "zipCode" : "11111",
-  "country" : "USA",
-  "amount" : 150.31,
-  "balance" : 4750.89
-}, {
-  "id" : 6,
-  "name" : "John Doe",
-  "address" : "123 My Street",
-  "city" : "My City",
-  "state" : "MS",
-  "zipCode" : "11111",
-  "country" : "USA",
-  "amount" : -15.31,
-  "balance" : 4750.89
-}, {
-  "id" : 7,
-  "name" : "John Doe",
-  "address" : "123 My Street",
-  "city" : "My City",
-  "state" : "MS",
-  "zipCode" : "11111",
-  "country" : "USA",
-  "amount" : 36.78,
-  "balance" : 48212.38
-}, {
-  "id" : 8,
-  "name" : "John Doe",
-  "address" : "123 My Street",
-  "city" : "My City",
-  "state" : "MS",
-  "zipCode" : "11111",
-  "country" : "USA",
-  "amount" : -21.34,
-  "balance" : 48212.38
-} ]
-</pre>
-</code>
+<h5>Flowfile 1</h5>
+<table>
+    <tr>
+        <th>Attribute name</th>
+        <th>Attribute Value</th>
+    </tr>
+    <tr>
+        <td>id</td>
+        <td>123</td>
+    </tr>
+    <tr>
+        <td>date</td>
+        <td>2017-07-07</td>
+    </tr>
+    <tr>
+        <td>boolean</td>
+        <td>true</td>
+    </tr>
+    <tr>
+        <td>arrays[0]</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>arrays[1]</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>arrays[2]</td>
+        <td>3</td>
+    </tr>
+    <tr>
+        <td>null</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>record.count</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>fragment.count</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>fragment.index</td>
+        <td>0</td>
+    </tr>
+</table>
 
-<h3>SPLIT mode</h3>
+<h5>Flowfile 2</h5>
+<table>
+    <tr>
+        <th>Attribute name</th>
+        <th>Attribute Value</th>
+    </tr>
+    <tr>
+        <td>id</td>
+        <td>456</td>
+    </tr>
+    <tr>
+        <td>date</td>
+        <td>2016-06-06</td>
+    </tr>
+    <tr>
+        <td>boolean</td>
+        <td>false</td>
+    </tr>
+    <tr>
+        <td>arrays[0]</td>
+        <td>4</td>
+    </tr>
+    <tr>
+        <td>arrays[1]</td>
+        <td>5</td>
+    </tr>
+    <tr>
+        <td>arrays[2]</td>
+        <td>6</td>
+    </tr>
+    <tr>
+        <td>null</td>
+        <td>not null</td>
+    </tr>
+    <tr>
+        <td>record.count</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>fragment.count</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>fragment.index</td>
+        <td>1</td>
+    </tr>
+</table>
 
-<h4>Example</h4>
+<h4 id="example3">Example 3 - Nested object</h4>
 
 <p>
-    Assuming we have the below data and we added a property "path" set to <code>/accounts</code>:
+    Input is flowfile (JSON):
 </p>
 
 <code>
@@ -345,86 +239,75 @@
 		"id": 43,
 		"balance": 48212.38
 	}]
-},
-{
-	"id": 2,
-	"name": "Jane Doe",
-	"address": "345 My Street",
-	"city": "Her City",
-	"state": "NY",
-	"zipCode": "22222",
-	"country": "USA",
-	"accounts": [{
-		"id": 45,
-		"balance": 6578.45
-	}, {
-		"id": 46,
-		"balance": 34567.21
-	}]
 }]
 </pre>
 </code>
-
 <p>
-    Then we'll get 4 records as below:
+    Result is flowfile (empty content) with attributes:
 </p>
 
-<code>
-<pre>
-[{
-	"id": 1,
-	"name": "John Doe",
-	"address": "123 My Street",
-	"city": "My City",
-	"state": "MS",
-	"zipCode": "11111",
-	"country": "USA",
-	"accounts": [{
-		"id": 42,
-		"balance": 4750.89
-	}]
-},
-{
-	"id": 1,
-	"name": "John Doe",
-	"address": "123 My Street",
-	"city": "My City",
-	"state": "MS",
-	"zipCode": "11111",
-	"country": "USA",
-	"accounts": [{
-		"id": 43,
-		"balance": 48212.38
-	}]
-},
-{
-	"id": 2,
-	"name": "Jane Doe",
-	"address": "345 My Street",
-	"city": "Her City",
-	"state": "NY",
-	"zipCode": "22222",
-	"country": "USA",
-	"accounts": [{
-		"id": 45,
-		"balance": 6578.45
-	}]
-},
-{
-	"id": 2,
-	"name": "Jane Doe",
-	"address": "345 My Street",
-	"city": "Her City",
-	"state": "NY",
-	"zipCode": "22222",
-	"country": "USA",
-	"accounts": [{
-		"id": 46,
-		"balance": 34567.21
-	}]
-}]
-</pre>
-</code>
+<table>
+    <tr>
+        <th>Attribute name</th>
+        <th>Attribute Value</th>
+    </tr>
+    <tr>
+        <td>id</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>John Doe</td>
+    </tr>
+    <tr>
+        <td>address</td>
+        <td>123 My Street</td>
+    </tr>
+    <tr>
+        <td>city</td>
+        <td>My City</td>
+    </tr>
+    <tr>
+        <td>state</td>
+        <td>MS</td>
+    </tr>
+    <tr>
+        <td>zipCode</td>
+        <td>11111</td>
+    </tr>
+    <tr>
+        <td>country</td>
+        <td>USA</td>
+    </tr>
+    <tr>
+        <td>accounts[0].id</td>
+        <td>42</td>
+    </tr>
+    <tr>
+        <td>accounts[0].balance</td>
+        <td>4750.89</td>
+    </tr>
+    <tr>
+        <td>accounts[1].id</td>
+        <td>43</td>
+    </tr>
+    <tr>
+        <td>accounts[1].balance</td>
+        <td>48212.38</td>
+    </tr>
+    <tr>
+        <td>record.count</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>fragment.count</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>fragment.index</td>
+        <td>0</td>
+    </tr>
+</table>
 
 </body>
 </html>

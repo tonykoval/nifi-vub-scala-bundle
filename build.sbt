@@ -18,7 +18,9 @@ libraryDependencies ++= Seq(
   "org.apache.nifi" % "nifi-record-serialization-services",
   "org.apache.nifi" % "nifi-schema-registry-service-api",
   "org.apache.nifi" % "nifi-ssl-context-service-api",
-  "org.apache.nifi" % "nifi-standard-record-utils"
+  "org.apache.nifi" % "nifi-standard-record-utils",
+  "org.apache.nifi" % "nifi-documentation",
+  "org.apache.nifi" % "nifi-framework-nar-utils"
 ).map(_ % nifiVersion.value)
 
 libraryDependencies ++= Seq(
