@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SplitRecordToAttribute</title>
+    <title>SplitRecordToAttributes</title>
     <link rel="stylesheet" href="css/component-usage.css" type="text/css"/>
 </head>
 <body>
@@ -11,7 +11,306 @@
 <p>Splits up an input FlowFile that is in a record-oriented data format into multiple smaller FlowFiles and content is
     also split into attributes as text. See examples in the additional details documentation of this processor.</p>
 
-<div w3-include-html="../src/main/resources/docs/sk.vub.nifi.processors.SplitRecordToAttributes/additionalDetails.html"></div>
+<h2>Examples</h2>
+
+<p>
+    To better understand how this Processor works, we will lay out a few examples.
+
+<ul id="menu">
+    <li><a href="#example1">Example 1 - One simple record</a></li>
+    <li><a href="#example2">Example 2 - Two simple records</a></li>
+    <li><a href="#example3">Example 3 - Nested object </a></li>
+</ul>
+</p>
+
+<h4 id="example1">Example 1 - One simple record</h4>
+
+<p>
+    Input is flowfile (JSON):
+</p>
+
+<code>
+<pre>
+[
+{
+  "id": 123,
+  "date": "2017-07-07",
+  "boolean": true,
+  "arrays": [1,2,3],
+  "null": null
+}
+]
+</pre>
+</code>
+<p>
+    Result is flowfile (empty content) with attributes:
+</p>
+
+<table>
+    <tr>
+        <th>Attribute name</th>
+        <th>Attribute Value</th>
+    </tr>
+    <tr>
+        <td>id</td>
+        <td>123</td>
+    </tr>
+    <tr>
+        <td>date</td>
+        <td>2017-07-07</td>
+    </tr>
+    <tr>
+        <td>boolean</td>
+        <td>true</td>
+    </tr>
+    <tr>
+        <td>arrays[0]</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>arrays[1]</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>arrays[2]</td>
+        <td>3</td>
+    </tr>
+    <tr>
+        <td>null</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>record.count</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>fragment.count</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>fragment.index</td>
+        <td>0</td>
+    </tr>
+</table>
+
+<h4 id="example2">Example 2 - Two simple record</h4>
+
+<p>
+    Input is flowfile (JSON):
+</p>
+
+<code>
+<pre>
+[
+{
+  "id": 123,
+  "date": "2017-07-07",
+  "boolean": true,
+  "arrays": [1,2,3],
+  "null": null
+},
+{
+  "id": 456,
+  "date": "2016-06-06",
+  "boolean": false,
+  "arrays": [4,5,6],
+  "null": "not null"
+}
+]
+</pre>
+</code>
+<p>
+    Result is 2 flowfiles (empty content) with attributes:
+</p>
+
+<h5>Flowfile 1</h5>
+<table>
+    <tr>
+        <th>Attribute name</th>
+        <th>Attribute Value</th>
+    </tr>
+    <tr>
+        <td>id</td>
+        <td>123</td>
+    </tr>
+    <tr>
+        <td>date</td>
+        <td>2017-07-07</td>
+    </tr>
+    <tr>
+        <td>boolean</td>
+        <td>true</td>
+    </tr>
+    <tr>
+        <td>arrays[0]</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>arrays[1]</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>arrays[2]</td>
+        <td>3</td>
+    </tr>
+    <tr>
+        <td>null</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>record.count</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>fragment.count</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>fragment.index</td>
+        <td>0</td>
+    </tr>
+</table>
+
+<h5>Flowfile 2</h5>
+<table>
+    <tr>
+        <th>Attribute name</th>
+        <th>Attribute Value</th>
+    </tr>
+    <tr>
+        <td>id</td>
+        <td>456</td>
+    </tr>
+    <tr>
+        <td>date</td>
+        <td>2016-06-06</td>
+    </tr>
+    <tr>
+        <td>boolean</td>
+        <td>false</td>
+    </tr>
+    <tr>
+        <td>arrays[0]</td>
+        <td>4</td>
+    </tr>
+    <tr>
+        <td>arrays[1]</td>
+        <td>5</td>
+    </tr>
+    <tr>
+        <td>arrays[2]</td>
+        <td>6</td>
+    </tr>
+    <tr>
+        <td>null</td>
+        <td>not null</td>
+    </tr>
+    <tr>
+        <td>record.count</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>fragment.count</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>fragment.index</td>
+        <td>1</td>
+    </tr>
+</table>
+
+<h4 id="example3">Example 3 - Nested object</h4>
+
+<p>
+    Input is flowfile (JSON):
+</p>
+
+<code>
+<pre>
+[{
+	"id": 1,
+	"name": "John Doe",
+	"address": "123 My Street",
+	"city": "My City",
+	"state": "MS",
+	"zipCode": "11111",
+	"country": "USA",
+	"accounts": [{
+		"id": 42,
+		"balance": 4750.89
+	}, {
+		"id": 43,
+		"balance": 48212.38
+	}]
+}]
+</pre>
+</code>
+<p>
+    Result is flowfile (empty content) with attributes:
+</p>
+
+<table>
+    <tr>
+        <th>Attribute name</th>
+        <th>Attribute Value</th>
+    </tr>
+    <tr>
+        <td>id</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>name</td>
+        <td>John Doe</td>
+    </tr>
+    <tr>
+        <td>address</td>
+        <td>123 My Street</td>
+    </tr>
+    <tr>
+        <td>city</td>
+        <td>My City</td>
+    </tr>
+    <tr>
+        <td>state</td>
+        <td>MS</td>
+    </tr>
+    <tr>
+        <td>zipCode</td>
+        <td>11111</td>
+    </tr>
+    <tr>
+        <td>country</td>
+        <td>USA</td>
+    </tr>
+    <tr>
+        <td>accounts[0].id</td>
+        <td>42</td>
+    </tr>
+    <tr>
+        <td>accounts[0].balance</td>
+        <td>4750.89</td>
+    </tr>
+    <tr>
+        <td>accounts[1].id</td>
+        <td>43</td>
+    </tr>
+    <tr>
+        <td>accounts[1].balance</td>
+        <td>48212.38</td>
+    </tr>
+    <tr>
+        <td>record.count</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>fragment.count</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>fragment.index</td>
+        <td>0</td>
+    </tr>
+</table>
 
 <h3>Tags: </h3>
 <p>split, record, attribute, json, avro, csv</p>
@@ -38,34 +337,4 @@
 <h3>Input requirement: </h3>This component requires an incoming relationship.<h3>System Resource Considerations:</h3>
 None specified.
 </body>
-<script>
-    function includeHTML() {
-        var z, i, elmnt, file, xhttp;
-        /* Loop through a collection of all HTML elements: */
-        z = document.getElementsByTagName("*");
-        for (i = 0; i < z.length; i++) {
-            elmnt = z[i];
-            /*search for elements with a certain atrribute:*/
-            file = elmnt.getAttribute("w3-include-html");
-            if (file) {
-                /* Make an HTTP request using the attribute value as the file name: */
-                xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState == 4) {
-                        if (this.status == 200) {elmnt.innerHTML = this.responseText;}
-                        if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
-                        /* Remove the attribute, and call this function once more: */
-                        elmnt.removeAttribute("w3-include-html");
-                        includeHTML();
-                    }
-                };
-                xhttp.open("GET", file, true);
-                xhttp.send();
-                /* Exit the function: */
-                return;
-            }
-        }
-    }
-    includeHTML()
-</script>
 </html>
