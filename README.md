@@ -8,7 +8,7 @@ A nifi bundle with custom processors
 - [SplitRecordToAttributes](docs/SplitRecordToAttributes.html)
 
 ### Nar archive
-To create nar archive (using `sbt-nifi-nar` [plugin](https://github.com/tonykoval/sbt-nifi-nar), `nifi-vub-scala-bundle-(version).nar`, run
+To create nar archive (using `sbt-nifi-nar` [plugin](https://github.com/tonykoval/sbt-nifi-nar)), `nifi-vub-scala-bundle-(version).nar`, run
 
     $ sbt narArchive
 
