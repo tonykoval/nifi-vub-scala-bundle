@@ -1,1 +1,1 @@
-addSbtPlugin("sk.vub" % "sbt-nifi-nar" % "0.1-SNAPSHOT")
+addSbtPlugin("com.github.tonykoval" % "sbt-nifi-nar" % "0.2")
