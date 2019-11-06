@@ -1,11 +1,11 @@
 nifi-vub-scala-bundle
 ========
 
-A nifi bundle with custom processors
+A nifi bundle with custom processors, [documentation](https://tonykoval.github.io/nifi-vub-scala-bundle/)
 
 ### Processors
 
-- [SplitRecordToAttributes](docs/SplitRecordToAttributes.html)
+- [SplitRecordToAttributes](https://tonykoval.github.io/nifi-vub-scala-bundle/SplitRecordToAttributes.html)
 
 ### Nar archive
 To create nar archive (using `sbt-nifi-nar` [plugin](https://github.com/tonykoval/sbt-nifi-nar)), `nifi-vub-scala-bundle-(version).nar`, run
