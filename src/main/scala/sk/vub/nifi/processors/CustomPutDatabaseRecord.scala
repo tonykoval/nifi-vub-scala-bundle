@@ -117,18 +117,6 @@ class CustomPutDatabaseRecord extends ScalaProcessor with FlowFileNotNull {
   }
 
   override def onTrigger(flowFile: FlowFile)(implicit context: ProcessContext, session: ProcessSession): Unit = {
-//    val process = new Put()[FunctionContext, Connection]
-//    process.setLogger(getLogger)
-//    process.initConnection((context, s, fc, ff) => {
-//      P.dbpcService.asControllerService[DBCPService]
-//    })
-//
-//    process.onCompleted((_, _, _, conn) => Try {
-//      conn.commit()
-//    }.recover {
-//      case e: SQLException => throw new ProcessException(s"Failed to commit database connection due to $e", e)
-//    })
-
     val readerFactory = P.recordReader.asControllerService[RecordReaderFactory]
     val dBCPService = P.dbpcService.asControllerService[DBCPService]
 
@@ -229,7 +217,7 @@ object CustomPutDatabaseRecord {
       .description("Batch Size")
       .addValidator(StandardValidators.NON_NEGATIVE_INTEGER_VALIDATOR)
       .expressionLanguageSupported(ExpressionLanguageScope.FLOWFILE_ATTRIBUTES)
-      .defaultValue("100")
+      .defaultValue("10000")
       .required(true)
       .build()
 

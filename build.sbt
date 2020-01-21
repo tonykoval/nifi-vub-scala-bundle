@@ -28,7 +28,6 @@ libraryDependencies ++= Seq(
   "org.apache.nifi"  % "nifi-record-serialization-services",
   "org.apache.nifi"  % "nifi-mock",
   "org.apache.nifi"  % "nifi-mock-record-utils",
-//  "org.apache.nifi"  % "nifi-documentation"
   "org.apache.nifi"  % "nifi-framework-nar-utils",
 ).map(_ % nifiVersion.value % Test)
 
@@ -44,6 +43,6 @@ libraryDependencies ++= Seq(
   "org.scalactic"        %% "scalactic"     % "3.0.8",
   "org.scala-lang"       % "scala-library"  % scalaVersion.value,
   "org.scalatest"        %% "scalatest"     % "3.0.8"      % Test,
-  "org.apache.derby"     % "derby"          % "10.14.2.0"  % Test,
+  "org.apache.derby"     % "derby"          % "10.11.1.1"  % Test,
   "org.mockito"          % "mockito-core"   % "3.1.0"      % Test,
 )
