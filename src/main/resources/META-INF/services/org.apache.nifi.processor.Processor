@@ -1,1 +1,2 @@
 sk.vub.nifi.processors.SplitRecordToAttributes
+sk.vub.nifi.processors.CustomPutDatabaseRecord

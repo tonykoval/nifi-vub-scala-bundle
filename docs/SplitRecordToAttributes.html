@@ -1,38 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>SplitRecordToAttributes</title>
-    <link rel="stylesheet" href="css/component-usage.css" type="text/css"/>
-    <link rel="stylesheet" href="css/main.css" type="text/css"/>
-</head>
-<body>
-<h1 id="nameHeader" >SplitRecordToAttributes</h1>
-<h2>Description: </h2>
-<p>Splits up an input FlowFile that is in a record-oriented data format into multiple smaller FlowFiles and content is
-    also split into attributes as text. See examples in the additional details documentation of this processor.</p>
-
-<h2>Examples</h2>
-
-<p>
-    To better understand how this Processor works, we will lay out a few examples.
-
-<ul id="menu">
-    <li><a href="#example1">Example 1 - One simple record</a></li>
-    <li><a href="#example2">Example 2 - Two simple records</a></li>
-    <li><a href="#example3">Example 3 - Nested object </a></li>
-</ul>
-</p>
-
-<h4 id="example1">Example 1 - One simple record</h4>
-
-<p>
-    Input is flowfile (JSON):
-</p>
-
-<code>
-<pre>
-[
+ <head>
+  <meta charset="utf-8">
+  <title>SplitRecordToAttributes</title>
+  <link rel="stylesheet" href="css/component-usage.css" type="text/css">
+  <script type="text/javascript">window.onload = function(){if(self==top) { document.getElementById('nameHeader').style.display = "inherit"; } }</script>
+  <link rel="stylesheet" href="css/main.css" type="text/css">
+ </head>
+ <body>
+  <h1 id="nameHeader" style="display: none;">SplitRecordToAttributes</h1>
+  <h2>Description: </h2>
+  <p>Splits up an input FlowFile that is in a record-oriented data format into multiple smaller FlowFiles and content is also split into attributes as text. See examples in the additional details documentation of this processor.</p>
+  <div>
+   <h2>Examples</h2> 
+   <p> To better understand how this Processor works, we will lay out a few examples. </p> 
+   <ul id="menu"> 
+    <li><a href="#example1">Example 1 - One simple record</a></li> 
+    <li><a href="#example2">Example 2 - Two simple records</a></li> 
+    <li><a href="#example3">Example 3 - Nested object </a></li> 
+   </ul> 
+   <p></p> 
+   <h4 id="example1">Example 1 - One simple record</h4> 
+   <p> Input is flowfile (JSON): </p> 
+   <code> <pre>[
 {
   "id": 123,
   "date": "2017-07-07",
@@ -41,68 +31,59 @@
   "null": null
 }
 ]
-</pre>
-</code>
-<p>
-    Result is flowfile (empty content) with attributes:
-</p>
-
-<table>
-    <tr>
-        <th>Attribute name</th>
-        <th>Attribute Value</th>
-    </tr>
-    <tr>
-        <td>id</td>
-        <td>123</td>
-    </tr>
-    <tr>
-        <td>date</td>
-        <td>2017-07-07</td>
-    </tr>
-    <tr>
-        <td>boolean</td>
-        <td>true</td>
-    </tr>
-    <tr>
-        <td>arrays[0]</td>
-        <td>1</td>
-    </tr>
-    <tr>
-        <td>arrays[1]</td>
-        <td>2</td>
-    </tr>
-    <tr>
-        <td>arrays[2]</td>
-        <td>3</td>
-    </tr>
-    <tr>
-        <td>null</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>record.count</td>
-        <td>1</td>
-    </tr>
-    <tr>
-        <td>fragment.count</td>
-        <td>1</td>
-    </tr>
-    <tr>
-        <td>fragment.index</td>
-        <td>0</td>
-    </tr>
-</table>
-
-<h4 id="example2">Example 2 - Two simple record</h4>
-
-<p>
-    Input is flowfile (JSON):
-</p>
-
-<code>
-<pre>
-[
+</pre> </code> 
+   <p> Result is flowfile (empty content) with attributes: </p> 
+   <table> 
+    <tbody> 
+     <tr> 
+      <th>Attribute name</th> 
+      <th>Attribute Value</th> 
+     </tr> 
+     <tr> 
+      <td>id</td> 
+      <td>123</td> 
+     </tr> 
+     <tr> 
+      <td>date</td> 
+      <td>2017-07-07</td> 
+     </tr> 
+     <tr> 
+      <td>boolean</td> 
+      <td>true</td> 
+     </tr> 
+     <tr> 
+      <td>arrays[0]</td> 
+      <td>1</td> 
+     </tr> 
+     <tr> 
+      <td>arrays[1]</td> 
+      <td>2</td> 
+     </tr> 
+     <tr> 
+      <td>arrays[2]</td> 
+      <td>3</td> 
+     </tr> 
+     <tr> 
+      <td>null</td> 
+      <td></td> 
+     </tr> 
+     <tr> 
+      <td>record.count</td> 
+      <td>1</td> 
+     </tr> 
+     <tr> 
+      <td>fragment.count</td> 
+      <td>1</td> 
+     </tr> 
+     <tr> 
+      <td>fragment.index</td> 
+      <td>0</td> 
+     </tr> 
+    </tbody> 
+   </table> 
+   <h4 id="example2">Example 2 - Two simple record</h4> 
+   <p> Input is flowfile (JSON): </p> 
+   <code> <pre>[
 {
   "id": 123,
   "date": "2017-07-07",
@@ -118,117 +99,109 @@
   "null": "not null"
 }
 ]
-</pre>
-</code>
-<p>
-    Result is 2 flowfiles (empty content) with attributes:
-</p>
-
-<h5>Flowfile 1</h5>
-<table>
-    <tr>
-        <th>Attribute name</th>
-        <th>Attribute Value</th>
-    </tr>
-    <tr>
-        <td>id</td>
-        <td>123</td>
-    </tr>
-    <tr>
-        <td>date</td>
-        <td>2017-07-07</td>
-    </tr>
-    <tr>
-        <td>boolean</td>
-        <td>true</td>
-    </tr>
-    <tr>
-        <td>arrays[0]</td>
-        <td>1</td>
-    </tr>
-    <tr>
-        <td>arrays[1]</td>
-        <td>2</td>
-    </tr>
-    <tr>
-        <td>arrays[2]</td>
-        <td>3</td>
-    </tr>
-    <tr>
-        <td>null</td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>record.count</td>
-        <td>2</td>
-    </tr>
-    <tr>
-        <td>fragment.count</td>
-        <td>2</td>
-    </tr>
-    <tr>
-        <td>fragment.index</td>
-        <td>0</td>
-    </tr>
-</table>
-
-<h5>Flowfile 2</h5>
-<table>
-    <tr>
-        <th>Attribute name</th>
-        <th>Attribute Value</th>
-    </tr>
-    <tr>
-        <td>id</td>
-        <td>456</td>
-    </tr>
-    <tr>
-        <td>date</td>
-        <td>2016-06-06</td>
-    </tr>
-    <tr>
-        <td>boolean</td>
-        <td>false</td>
-    </tr>
-    <tr>
-        <td>arrays[0]</td>
-        <td>4</td>
-    </tr>
-    <tr>
-        <td>arrays[1]</td>
-        <td>5</td>
-    </tr>
-    <tr>
-        <td>arrays[2]</td>
-        <td>6</td>
-    </tr>
-    <tr>
-        <td>null</td>
-        <td>not null</td>
-    </tr>
-    <tr>
-        <td>record.count</td>
-        <td>2</td>
-    </tr>
-    <tr>
-        <td>fragment.count</td>
-        <td>2</td>
-    </tr>
-    <tr>
-        <td>fragment.index</td>
-        <td>1</td>
-    </tr>
-</table>
-
-<h4 id="example3">Example 3 - Nested object</h4>
-
-<p>
-    Input is flowfile (JSON):
-</p>
-
-<code>
-<pre>
-[{
+</pre> </code> 
+   <p> Result is 2 flowfiles (empty content) with attributes: </p> 
+   <h5>Flowfile 1</h5> 
+   <table> 
+    <tbody> 
+     <tr> 
+      <th>Attribute name</th> 
+      <th>Attribute Value</th> 
+     </tr> 
+     <tr> 
+      <td>id</td> 
+      <td>123</td> 
+     </tr> 
+     <tr> 
+      <td>date</td> 
+      <td>2017-07-07</td> 
+     </tr> 
+     <tr> 
+      <td>boolean</td> 
+      <td>true</td> 
+     </tr> 
+     <tr> 
+      <td>arrays[0]</td> 
+      <td>1</td> 
+     </tr> 
+     <tr> 
+      <td>arrays[1]</td> 
+      <td>2</td> 
+     </tr> 
+     <tr> 
+      <td>arrays[2]</td> 
+      <td>3</td> 
+     </tr> 
+     <tr> 
+      <td>null</td> 
+      <td></td> 
+     </tr> 
+     <tr> 
+      <td>record.count</td> 
+      <td>2</td> 
+     </tr> 
+     <tr> 
+      <td>fragment.count</td> 
+      <td>2</td> 
+     </tr> 
+     <tr> 
+      <td>fragment.index</td> 
+      <td>0</td> 
+     </tr> 
+    </tbody> 
+   </table> 
+   <h5>Flowfile 2</h5> 
+   <table> 
+    <tbody> 
+     <tr> 
+      <th>Attribute name</th> 
+      <th>Attribute Value</th> 
+     </tr> 
+     <tr> 
+      <td>id</td> 
+      <td>456</td> 
+     </tr> 
+     <tr> 
+      <td>date</td> 
+      <td>2016-06-06</td> 
+     </tr> 
+     <tr> 
+      <td>boolean</td> 
+      <td>false</td> 
+     </tr> 
+     <tr> 
+      <td>arrays[0]</td> 
+      <td>4</td> 
+     </tr> 
+     <tr> 
+      <td>arrays[1]</td> 
+      <td>5</td> 
+     </tr> 
+     <tr> 
+      <td>arrays[2]</td> 
+      <td>6</td> 
+     </tr> 
+     <tr> 
+      <td>null</td> 
+      <td>not null</td> 
+     </tr> 
+     <tr> 
+      <td>record.count</td> 
+      <td>2</td> 
+     </tr> 
+     <tr> 
+      <td>fragment.count</td> 
+      <td>2</td> 
+     </tr> 
+     <tr> 
+      <td>fragment.index</td> 
+      <td>1</td> 
+     </tr> 
+    </tbody> 
+   </table> 
+   <h4 id="example3">Example 3 - Nested object</h4> 
+   <p> Input is flowfile (JSON): </p> 
+   <code> <pre>[{
 	"id": 1,
 	"name": "John Doe",
 	"address": "123 My Street",
@@ -244,98 +217,96 @@
 		"balance": 48212.38
 	}]
 }]
-</pre>
-</code>
-<p>
-    Result is flowfile (empty content) with attributes:
-</p>
-
-<table>
+</pre> </code> 
+   <p> Result is flowfile (empty content) with attributes: </p> 
+   <table> 
+    <tbody> 
+     <tr> 
+      <th>Attribute name</th> 
+      <th>Attribute Value</th> 
+     </tr> 
+     <tr> 
+      <td>id</td> 
+      <td>1</td> 
+     </tr> 
+     <tr> 
+      <td>name</td> 
+      <td>John Doe</td> 
+     </tr> 
+     <tr> 
+      <td>address</td> 
+      <td>123 My Street</td> 
+     </tr> 
+     <tr> 
+      <td>city</td> 
+      <td>My City</td> 
+     </tr> 
+     <tr> 
+      <td>state</td> 
+      <td>MS</td> 
+     </tr> 
+     <tr> 
+      <td>zipCode</td> 
+      <td>11111</td> 
+     </tr> 
+     <tr> 
+      <td>country</td> 
+      <td>USA</td> 
+     </tr> 
+     <tr> 
+      <td>accounts[0].id</td> 
+      <td>42</td> 
+     </tr> 
+     <tr> 
+      <td>accounts[0].balance</td> 
+      <td>4750.89</td> 
+     </tr> 
+     <tr> 
+      <td>accounts[1].id</td> 
+      <td>43</td> 
+     </tr> 
+     <tr> 
+      <td>accounts[1].balance</td> 
+      <td>48212.38</td> 
+     </tr> 
+     <tr> 
+      <td>record.count</td> 
+      <td>1</td> 
+     </tr> 
+     <tr> 
+      <td>fragment.count</td> 
+      <td>1</td> 
+     </tr> 
+     <tr> 
+      <td>fragment.index</td> 
+      <td>0</td> 
+     </tr> 
+    </tbody> 
+   </table>
+  </div>
+  <h3>Tags: </h3>
+  <p>split, record, attribute, json, avro, csv</p>
+  <h3>Properties: </h3>
+  <p>In the list below, the names of required properties appear in <strong>bold</strong>. Any other properties (not in bold) are considered optional. The table also indicates any default values.</p>
+  <table id="properties">
+   <tbody>
     <tr>
-        <th>Attribute name</th>
-        <th>Attribute Value</th>
+     <th>Name</th>
+     <th>Default Value</th>
+     <th>Allowable Values</th>
+     <th>Description</th>
     </tr>
     <tr>
-        <td>id</td>
-        <td>1</td>
+     <td id="name"><strong>Record Reader</strong></td>
+     <td id="default-value"></td>
+     <td id="allowable-values"><strong>Controller Service API: </strong><br>RecordReaderFactory<br>No implementations found.</td>
+     <td id="description">Specifies the Controller Service to use for reading incoming data</td>
     </tr>
-    <tr>
-        <td>name</td>
-        <td>John Doe</td>
-    </tr>
-    <tr>
-        <td>address</td>
-        <td>123 My Street</td>
-    </tr>
-    <tr>
-        <td>city</td>
-        <td>My City</td>
-    </tr>
-    <tr>
-        <td>state</td>
-        <td>MS</td>
-    </tr>
-    <tr>
-        <td>zipCode</td>
-        <td>11111</td>
-    </tr>
-    <tr>
-        <td>country</td>
-        <td>USA</td>
-    </tr>
-    <tr>
-        <td>accounts[0].id</td>
-        <td>42</td>
-    </tr>
-    <tr>
-        <td>accounts[0].balance</td>
-        <td>4750.89</td>
-    </tr>
-    <tr>
-        <td>accounts[1].id</td>
-        <td>43</td>
-    </tr>
-    <tr>
-        <td>accounts[1].balance</td>
-        <td>48212.38</td>
-    </tr>
-    <tr>
-        <td>record.count</td>
-        <td>1</td>
-    </tr>
-    <tr>
-        <td>fragment.count</td>
-        <td>1</td>
-    </tr>
-    <tr>
-        <td>fragment.index</td>
-        <td>0</td>
-    </tr>
-</table>
-
-<h3>Tags: </h3>
-<p>split, record, attribute, json, avro, csv</p>
-<h3>Properties: </h3>
-<p>In the list below, the names of required properties appear in <strong>bold</strong>. Any other properties (not in
-    bold) are considered optional. The table also indicates any default values.</p>
-<table id="properties">
-    <tr>
-        <th>Name</th>
-        <th>Default Value</th>
-        <th>Allowable Values</th>
-        <th>Description</th>
-    </tr>
-    <tr>
-        <td id="name"><strong>Record Reader</strong></td>
-        <td id="default-value"></td>
-        <td id="allowable-values"><strong>Controller Service API: </strong><br/>RecordReaderFactory<br/>No
-            implementations found.
-        </td>
-        <td id="description">Specifies the Controller Service to use for reading incoming data</td>
-    </tr>
-</table>
-<h3>State management: </h3>This component does not store state.<h3>Restricted: </h3>This component is not restricted.
-<h3>Input requirement: </h3>This component requires an incoming relationship.<h3>System Resource Considerations:</h3>
-None specified.
-</body>
+   </tbody>
+  </table>
+  <h3>State management: </h3>This component does not store state.
+  <h3>Restricted: </h3>This component is not restricted.
+  <h3>Input requirement: </h3>This component requires an incoming relationship.
+  <h3>System Resource Considerations:</h3>None specified.
+ </body>
 </html>

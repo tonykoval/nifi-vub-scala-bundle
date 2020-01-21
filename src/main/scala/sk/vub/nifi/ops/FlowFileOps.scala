@@ -7,7 +7,7 @@ import java.util.regex.Pattern
 import org.apache.nifi.flowfile.FlowFile
 import org.apache.nifi.processor._
 
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 /** Provides convenience methods from ProcessSession related to FlowFile */
 class FlowFileOps(val flowFile: FlowFile) extends AnyVal {

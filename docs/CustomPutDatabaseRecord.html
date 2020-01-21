@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="utf-8">
+  <title>CustomPutDatabaseRecord</title>
+  <link rel="stylesheet" href="css/component-usage.css" type="text/css">
+  <script type="text/javascript">window.onload = function(){if(self==top) { document.getElementById('nameHeader').style.display = "inherit"; } }</script>
+  <link rel="stylesheet" href="css/main.css" type="text/css">
+ </head>
+ <body>
+  <h1 id="nameHeader" style="display: none;">CustomPutDatabaseRecord</h1>
+  <h2>Description: </h2>
+  <p>No description provided.</p>
+  <div></div>
+  <h3>Tags: </h3>
+  <p>custom, put, database, record</p>
+  <h3>Properties: </h3>
+  <p>In the list below, the names of required properties appear in <strong>bold</strong>. Any other properties (not in bold) are considered optional. The table also indicates any default values, and whether a property supports the <a href="../../../../../html/expression-language-guide.html">NiFi Expression Language</a>.</p>
+  <table id="properties">
+   <tbody>
+    <tr>
+     <th>Name</th>
+     <th>Default Value</th>
+     <th>Allowable Values</th>
+     <th>Description</th>
+    </tr>
+    <tr>
+     <td id="name"><strong>Record Reader</strong></td>
+     <td id="default-value"></td>
+     <td id="allowable-values"><strong>Controller Service API: </strong><br>RecordReaderFactory<br>No implementations found.</td>
+     <td id="description">Specifies the Controller Service to use for parsing incoming data and determining the data's schema.</td>
+    </tr>
+    <tr>
+     <td id="name"><strong>Database Connection Pooling Service</strong></td>
+     <td id="default-value"></td>
+     <td id="allowable-values"><strong>Controller Service API: </strong><br>DBCPService<br>No implementations found.</td>
+     <td id="description">The Controller Service that is used to obtain a connection to the database for sending records.</td>
+    </tr>
+    <tr>
+     <td id="name"><strong>mapping</strong></td>
+     <td id="default-value">[]</td>
+     <td id="allowable-values"></td>
+     <td id="description">Mapping of columns to database datatypes (as json array)<br><strong>Supports Expression Language: true (will be evaluated using flow file attributes and variable registry)</strong></td>
+    </tr>
+    <tr>
+     <td id="name"><strong>SQL Statement</strong></td>
+     <td id="default-value">INSERT INTO ${table}(ID, NAME) VALUES(?, ?)</td>
+     <td id="allowable-values"></td>
+     <td id="description">SQL Statement<br><strong>Supports Expression Language: true (will be evaluated using flow file attributes and variable registry)</strong></td>
+    </tr>
+    <tr>
+     <td id="name"><strong>Batch Size</strong></td>
+     <td id="default-value">100</td>
+     <td id="allowable-values"></td>
+     <td id="description">Batch Size<br><strong>Supports Expression Language: true (will be evaluated using flow file attributes and variable registry)</strong></td>
+    </tr>
+    <tr>
+     <td id="name">Query Timeout</td>
+     <td id="default-value">300</td>
+     <td id="allowable-values"></td>
+     <td id="description">Query Timeout in seconds<br><strong>Supports Expression Language: true (will be evaluated using flow file attributes and variable registry)</strong></td>
+    </tr>
+    <tr>
+     <td id="name"><strong>SQL auto commit</strong></td>
+     <td id="default-value">true</td>
+     <td id="allowable-values">
+      <ul>
+       <li>true</li>
+       <li>false</li>
+      </ul></td>
+     <td id="description">SQL auto commit commits after every row insert, set to false to commit whole batches (better performance)</td>
+    </tr>
+   </tbody>
+  </table>
+  <h3>State management: </h3>This component does not store state.
+  <h3>Restricted: </h3>This component is not restricted.
+  <h3>Input requirement: </h3>This component requires an incoming relationship.
+  <h3>System Resource Considerations:</h3>None specified.
+ </body>
+</html>

@@ -6,7 +6,7 @@ import org.apache.nifi.util.TestRunners
 import org.scalatest.{FunSpec, Matchers}
 import sk.vub.nifi.processors.SplitRecordToAttributes._
 
-import scala.jdk.CollectionConverters._
+import scala.collection.JavaConverters._
 
 class SplitRecordToAttributesSpec extends FunSpec with Matchers {
 
@@ -175,20 +175,5 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
       flowFile.assertAttributeEquals("fragment.count", "1")
       flowFile.assertAttributeEquals("fragment.index", "0")
     }
-  }
-
-  // TODO: add this functionality to sbt-nifi-nar plugin
-  it("generate documentation") {
-    import org.apache.nifi.documentation.html.HtmlDocumentationWriter
-    import org.apache.nifi.nar.StandardExtensionDiscoveringManager
-    import java.io.ByteArrayOutputStream
-
-    val extensionManager = new StandardExtensionDiscoveringManager()
-    val processor = new SplitRecordToAttributes
-    val htmlDocumentationWriter = new HtmlDocumentationWriter(extensionManager)
-    val baos = new ByteArrayOutputStream()
-    htmlDocumentationWriter.write(processor, baos, false)
-
-    new String(baos.toByteArray)
   }
 }
