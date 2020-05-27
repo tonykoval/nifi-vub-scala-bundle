@@ -36,17 +36,6 @@ package object nifi {
     a
   }
 
-//  def unfoldNotNull[A <: AnyRef](next: => A): LazyList[A] = {
-//    val n = next
-//    if (n == null) LazyList.empty
-//    else n #:: unfoldNotNull(next)
-//  }
-//
-//  def unfoldWhile[A](hasNext: () => Boolean, getNext: () => A): LazyList[A] = {
-//    if (hasNext()) getNext() #:: unfoldWhile(hasNext, getNext)
-//    else LazyList.empty
-//  }
-
   def resolveOptions[A](opts: Option[A]*): Option[A] = opts.find(_.isDefined).flatten
 
   def contains[A](item: A, opts: Option[A]*): Option[Boolean] = {

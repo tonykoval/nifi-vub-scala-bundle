@@ -4,8 +4,8 @@ name := "nifi-vub-scala-bundle"
 organization := "sk.vub"
 version := "0.1"
 
-scalaVersion := "2.12.10"
-nifiVersion := "1.10.0"
+scalaVersion := "2.12.11"
+nifiVersion := "1.11.4"
 val circeVersion = "0.12.0"
 
 libraryDependencies ++= Seq(
@@ -46,3 +46,9 @@ libraryDependencies ++= Seq(
   "org.apache.derby"     % "derby"          % "10.11.1.1"  % Test,
   "org.mockito"          % "mockito-core"   % "3.1.0"      % Test,
 )
+
+enablePlugins(ScalaJSPlugin)
+scalaJSUseMainModuleInitializer := true
+
+resolvers +=
+  "Spring.io" at "https://repo.spring.io/libs-release" //simple-syslog-5424 - missing in maven

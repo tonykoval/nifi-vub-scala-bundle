@@ -39,7 +39,7 @@ class SplitRecordToAttributes extends ScalaProcessor with FlowFileNotNull {
 
   def relationships: Set[Relationship] = Set(R.failure, R.original, R.splits)
 
-  def onTrigger(flowFile: FlowFile)(implicit context: ProcessContext, session: ProcessSession): Unit = {
+  def onTrigger(flowFile: FlowFile)(implicit processContext: ProcessContext, processSession: ProcessSession): Unit = {
     val readerFactory = P.recordReader.asControllerService[RecordReaderFactory]
     val fragmentId = UUID.randomUUID().toString;
 
@@ -97,6 +97,7 @@ object SplitRecordToAttributes {
       .name("original")
       .description("Upon successfully splitting an input FlowFile, the original FlowFile will be sent to" +
         " this relationship.")
+      .autoTerminateDefault(true)
       .build()
 
     val splits: Relationship = new Relationship.Builder()
