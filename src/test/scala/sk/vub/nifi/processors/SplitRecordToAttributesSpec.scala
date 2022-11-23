@@ -176,19 +176,4 @@ class SplitRecordToAttributesSpec extends FunSpec with Matchers {
       flowFile.assertAttributeEquals("fragment.index", "0")
     }
   }
-
-  // TODO: add this functionality to sbt-nifi-nar plugin
-  it("generate documentation") {
-    import org.apache.nifi.documentation.html.HtmlDocumentationWriter
-    import org.apache.nifi.nar.StandardExtensionDiscoveringManager
-    import java.io.ByteArrayOutputStream
-
-    val extensionManager = new StandardExtensionDiscoveringManager()
-    val processor = new SplitRecordToAttributes
-    val htmlDocumentationWriter = new HtmlDocumentationWriter(extensionManager)
-    val baos = new ByteArrayOutputStream()
-    htmlDocumentationWriter.write(processor, baos, false)
-
-    new String(baos.toByteArray)
-  }
 }

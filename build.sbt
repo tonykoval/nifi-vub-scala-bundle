@@ -2,10 +2,10 @@ enablePlugins(NarPlugin)
 
 name := "nifi-vub-scala-bundle"
 organization := "sk.vub"
-version := "0.1"
+version := "0.2"
 
 scalaVersion := "2.13.1"
-nifiVersion := "1.10.0"
+nifiVersion := "1.18.0"
 val circeVersion = "0.12.0"
 
 libraryDependencies ++= Seq(
@@ -14,15 +14,11 @@ libraryDependencies ++= Seq(
   "org.apache.nifi" % "nifi-record-serialization-service-api",
   "org.apache.nifi" % "nifi-schema-registry-service-api",
   "org.apache.nifi" % "nifi-ssl-context-service-api",
-  "org.apache.nifi" % "nifi-processor-utils",
   "org.apache.nifi" % "nifi-standard-record-utils",
   "org.apache.nifi" % "nifi-record",
-  "org.apache.nifi" % "nifi-hadoop-utils"
-).map(_ % nifiVersion.value)
-
-libraryDependencies ++= Seq(
+  "org.apache.nifi" % "nifi-hadoop-utils",
   "org.apache.nifi" % "nifi-record-serialization-services"
-).map(_ % nifiVersion.value % "provided")
+).map(_ % nifiVersion.value)
 
 libraryDependencies ++= Seq(
   "org.apache.nifi" % "nifi-record-serialization-services",
